@@ -1,7 +1,7 @@
 'use strict';
 
 const dataBase = JSON.parse(localStorage.getItem('awito')) || [];
-
+let counter = dataBase.length;
 const modalAdd = document.querySelector('.modal__add'),
   btnAdd = document.querySelector('.add__ad'),
   modalBtnSubmit = document.querySelector('.modal__btn-submit'),
@@ -18,8 +18,9 @@ const modalImageItem = document.querySelector('.modal__image-item'),
   modalStatusItem = document.querySelector('.modal__status-item'),
   modalDescriptionItem = document.querySelector('.modal__description-item'),
   modalCostItem = document.querySelector('.modal__cost-item');
-const searchInput = document.querySelector('.search__input');
-let counter = 0;
+const searchInput = document.querySelector('.search__input'),
+  menuContainer = document.querySelector('.menu__container');
+
 const textFileBtn = modalFileBtn.textContent;
 const srcModalImage = modalImageAdd.src;
 
@@ -54,6 +55,7 @@ const closeModal = event => {
 
 const renderCard = (DB = dataBase) => {
   catalog.textContent = '';
+
   DB.forEach(item => {
     catalog.insertAdjacentHTML('beforeend', `
     <li class="card" data-id-item="${item.id}">
@@ -129,6 +131,15 @@ btnAdd.addEventListener('click', () => {
   document.addEventListener('keydown', closeModal);
 });
 
+menuContainer.addEventListener('click', event =>{
+  const target = event.target;
+
+  if(target.tagName === 'A') {
+    const result = dataBase.filter(item => item.category === target.dataset.category);
+    renderCard(result);
+  }
+});
+
 modalAdd.addEventListener('click', closeModal);
 modalItem.addEventListener('click', closeModal);
 document.addEventListener('keydown', closeModal);
@@ -138,8 +149,7 @@ catalog.addEventListener('click', event => {
   const card = target.closest('.card');
 
   if (card) {
-    const item = dataBase.find(item => item.id === card.dataset.id);
-
+    const item = dataBase.find(obj => obj.id === +card.dataset.idItem);
     modalImageItem.src = `data:image/jpeg;base64,${item.image}`;
     modalHeaderItem.textContent = item.nameItem;
     modalStatusItem.textContent = item.status === 'new' ? 'Новый' : 'Б/У';
